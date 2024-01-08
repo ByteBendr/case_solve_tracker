@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <title>Case Solve Tracker</title>
+</head>
+<body>
+  <div class="container">
+    <div class="center-align title-wrapper">
+      <h1>Case Solve Tracker</h1>
+      <div id="totalTickets" class="center-align total-tickets">
+        <span id="totalTicketCount">0</span>
+      </div>
+    </div>
+
+    <form id="ticketForm" class="col s12">
+      <div class="input-field">
+        <input type="text" id="ticketNumber" name="ticketNumber" required>
+        <label for="ticketNumber">Case Number</label>
+      </div>
+
+      <button class="btn waves-effect waves-light" type="button" onclick="addTicket()" style="font-family: 'Poppins', sans-serif">Add Case
+        <i class="material-icons right">send</i>
+      </button>
+
+      <a class="waves-effect waves-light btn modal-trigger red lighten-1" href="#clearListModal">Clear List
+        <i class="material-icons right">clear</i>
+      </a>
+
+      <a class="btn waves-effect waves-light blue" onclick="exportToText()">Export to Text
+        <i class="material-icons right">download</i>
+      </a>
+    </form>
+
+    <ul id="ticketList" class="collection"></ul>
+  </div>
+
+  <!-- Clear List Modal Structure -->
+  <div id="clearListModal" class="modal">
+    <div class="modal-content center-align">
+      <h4>Clear List Confirmation</h4>
+      <p>Are you sure you want to clear the case list?</p>
+    </div>
+    <div class="modal-footer center-align">
+      <a href="#" class="modal-close waves-effect waves-green btn-flat">Cancel</a>
+      <a href="#" class="waves-effect waves-red btn-flat" onclick="clearTicketList()">Clear List</a>
+    </div>
+  </div>
+
+  <script>
+    // Function to export the ticket list to text
+    function exportToText() {
+    const tickets = JSON.parse(localStorage.getItem('tickets')) || [];
+    const totalSolvedCases = tickets.length;
+
+    if (totalSolvedCases === 0) {
+      alert('Do not try funny stuff, the list is empty, what do you want me to export? Get back to work and stop testing me...');
+      return;
+    }
+
+    // Convert the array of tickets to a plain text string
+    const textContent = tickets.join('\n') + `\n\n=== Total Solved Cases: ${totalSolvedCases} ===`;
+
+    // Create a blob with the text content
+    const blob = new Blob([textContent], { type: 'text/plain' });
+
+    // Generate a file name with the current date (local time)
+    const currentDate = new Date();
+    const localDate = new Date(currentDate.getTime() - currentDate.getTimezoneOffset() * 60000);
+    const fileName = `solved_cases_list_${localDate.toISOString().split('T')[0]}.txt`;
+
+    // Create a link element to trigger the download
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fileName;
+
+    // Append the link to the document and trigger the download
+    document.body.appendChild(a);
+    a.click();
+
+    // Remove the link from the document
+    document.body.removeChild(a);
+  }
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
